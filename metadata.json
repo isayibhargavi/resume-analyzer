@@ -1,0 +1,8 @@
+{
+  "name": "Resume Analyzer",
+  "description": "Automated resume evaluation portal integrated directly with your n8n workflow for instant candidate parsing, ATS insights, and webhook dispatch.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
