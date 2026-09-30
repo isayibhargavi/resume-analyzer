@@ -1,3 +1,5 @@
+import { DiagnosticsData } from '../components/AtsDiagnosticsCard';
+
 export interface SampleResume {
   id: string;
   name: string;
@@ -6,6 +8,7 @@ export interface SampleResume {
   fileName: string;
   jobDescription: string;
   content: string;
+  diagnostics: DiagnosticsData;
 }
 
 export const SAMPLE_RESUMES: SampleResume[] = [
@@ -51,7 +54,98 @@ Dean's Honors List, Magna Cum Laude
 
 CERTIFICATIONS
 - AWS Certified Solutions Architect - Associate
-- Google Cloud Certified Professional Cloud Developer`
+- Google Cloud Certified Professional Cloud Developer`,
+    diagnostics: {
+      score: 88,
+      tierKicker: 'Top 12% Candidate Tier',
+      matchTitle: 'Strong Match for Senior Engineering Roles',
+      matchDescription: 'High technical depth and quantifiable metrics. A few targeted ATS keyword enhancements will push this past competitive screen filters.',
+      metrics: {
+        impact: { value: 92, label: 'Quantified' },
+        atsFit: { value: 84, label: 'Keywords' },
+        structure: { value: 95, label: 'Hierarchy' },
+        brevity: { value: 81, label: 'Active Voice' },
+      },
+      bulletRewrites: [
+        {
+          category: 'WORK EXPERIENCE · CLOUDNOVA SOLUTIONS',
+          impactBoost: 'Impact Score: +38% boost',
+          beforeLabel: 'Before (Passive)',
+          beforeText: '"Worked on backend APIs in Node.js and helped improve system performance for our user base."',
+          afterLabel: 'After (n8n AI Optimization)',
+          afterText: '"Architected high-throughput microservices in Node.js/TypeScript handling 8.5M+ requests daily, slashing P99 latency by 42%."',
+        },
+        {
+          category: 'FRONTEND OPTIMIZATION · APEX SYSTEMS',
+          impactBoost: 'Impact Score: +45% boost',
+          beforeLabel: 'Before (Vague)',
+          beforeText: '"Updated our React code to Vite and made web pages load faster for users."',
+          afterLabel: 'After (n8n AI Optimization)',
+          afterText: '"Spearheaded enterprise migration from legacy Webpack to modular Vite architecture, trimming bundle size by 38% and accelerating First Contentful Paint by 1.4s."',
+        },
+      ],
+      keywords: [
+        {
+          name: 'Kubernetes Orchestration',
+          status: 'missing',
+          importance: 'High',
+          contextTip: 'Crucial for infrastructure & platform engineering filters. Mention cluster scaling or Helm deployments.',
+        },
+        {
+          name: 'Distributed Systems Architecture',
+          status: 'missing',
+          importance: 'High',
+          contextTip: 'Mention idempotency, event-driven pipelines, or asynchronous message brokers.',
+        },
+        {
+          name: 'TypeScript & React 19',
+          status: 'found',
+          importance: 'High',
+          contextTip: 'Appears prominently in tech stack and project highlights.',
+        },
+        {
+          name: 'CI/CD & Automated Testing',
+          status: 'found',
+          importance: 'Medium',
+          contextTip: 'GitHub Actions, Docker, and Vitest detected with strong context.',
+        },
+      ],
+      formattingChecks: [
+        {
+          title: 'Standardized Font & Heading Hierarchy',
+          description: 'Single consistent font family without decorative icons, watermarks, or un-parseable table blocks.',
+          passed: true,
+        },
+        {
+          title: 'Linear Single-Column Text Flow',
+          description: 'Document reads seamlessly top-to-bottom without multi-column parsing collisions in ATS engines.',
+          passed: true,
+        },
+        {
+          title: 'Contact Information Placement',
+          description: 'Email, phone, and LinkedIn URLs detected in standard top header region.',
+          passed: true,
+        },
+        {
+          title: 'Chronological Experience Formatting',
+          description: 'All work history entries include standardized company, title, and year ranges.',
+          passed: true,
+        },
+      ],
+      recruiterSummary: {
+        overview: 'Exceptional senior engineering candidate with 7+ years of verifiable production impact across distributed systems and modern web architecture. Strong leadership signals and quantifiable accomplishments.',
+        strengths: [
+          'Slashing P99 latency by 42% across microservices handling 8.5M+ daily queries',
+          'Spearheaded enterprise migration to Vite, cutting bundle size by 38%',
+          'Proven mentorship and cross-functional leadership across 6 product teams',
+        ],
+        interviewPrompts: [
+          'Walk through how you identified the bottlenecks that led to cutting P99 latency by 42%.',
+          'How do you handle API deprecation and schema migrations in high-throughput microservices?',
+          'What strategies did you use to drive design system adoption across 6 separate engineering squads?',
+        ],
+      },
+    },
   },
   {
     id: 'product',
@@ -87,7 +181,97 @@ Senior Product Manager | Workflow Labs | 2018 - 2021
 - Boosted net retention rate (NRR) from 104% to 121% through targeted enterprise security compliance features.
 
 EDUCATION
-Bachelor of Science in Industrial Engineering & Operations Research | Columbia University (2014 - 2018)`
+Bachelor of Science in Industrial Engineering & Operations Research | Columbia University (2014 - 2018)`,
+    diagnostics: {
+      score: 91,
+      tierKicker: 'Top 8% Product Leadership Tier',
+      matchTitle: 'Strong Match for Staff & Lead Product Roles',
+      matchDescription: 'Outstanding commercial rigor with $3.2M ARR attribution and cross-functional metrics. Strong GTM and analytics balance.',
+      metrics: {
+        impact: { value: 96, label: 'Quantified' },
+        atsFit: { value: 89, label: 'Keywords' },
+        structure: { value: 94, label: 'Hierarchy' },
+        brevity: { value: 87, label: 'Active Voice' },
+      },
+      bulletRewrites: [
+        {
+          category: 'CORE PRODUCT ROADMAPPING · SYNTHIQ',
+          impactBoost: 'Impact Score: +42% boost',
+          beforeLabel: 'Before (Passive)',
+          beforeText: '"Managed product features and worked with engineers to launch new tools for our users."',
+          afterLabel: 'After (n8n AI Optimization)',
+          afterText: '"Formulated end-to-end product roadmap for AI workflow orchestrator, expanding ARR by $3.2M within 18 months across 4,200 paying teams."',
+        },
+        {
+          category: 'RETENTION & GTM · WORKFLOW LABS',
+          impactBoost: 'Impact Score: +36% boost',
+          beforeLabel: 'Before (Vague)',
+          beforeText: '"Talked to customers and made improvements that helped keep users subscribed longer."',
+          afterLabel: 'After (n8n AI Optimization)',
+          afterText: '"Conducted 80+ customer discovery audits, shipping key compliance features that elevated Net Revenue Retention from 104% to 121%."',
+        },
+      ],
+      keywords: [
+        {
+          name: 'PLG (Product-Led Growth)',
+          status: 'missing',
+          importance: 'High',
+          contextTip: 'Crucial acronym for modern B2B SaaS leadership filters.',
+        },
+        {
+          name: 'Cohort Retention Analysis',
+          status: 'missing',
+          importance: 'Medium',
+          contextTip: 'Highlight lifetime value (LTV) and CAC payback models.',
+        },
+        {
+          name: 'Workflow Automation & n8n',
+          status: 'found',
+          importance: 'High',
+          contextTip: 'Direct keyword match found in core competencies.',
+        },
+        {
+          name: 'Cross-functional Leadership',
+          status: 'found',
+          importance: 'High',
+          contextTip: 'Clearly documented across 16-engineer sprint cadence.',
+        },
+      ],
+      formattingChecks: [
+        {
+          title: 'Metric Attributability',
+          description: 'Quantifiable business outcomes ($ARR, NRR%, sprint cadence) clearly highlighted.',
+          passed: true,
+        },
+        {
+          title: 'ATS Scanner Legibility',
+          description: 'No tables or graphical bars obstructing text parser reading order.',
+          passed: true,
+        },
+        {
+          title: 'Core Competency Clustering',
+          description: 'Clean skill groupings enabling keyword parser extraction without noise.',
+          passed: true,
+        },
+        {
+          title: 'Contact Verification',
+          description: 'Verified email and LinkedIn links readily indexed.',
+          passed: true,
+        },
+      ],
+      recruiterSummary: {
+        overview: 'Top-tier product leader with proven track record scaling B2B automation tools. Outstanding commercial outcomes ($3.2M ARR growth) paired with rigorous qualitative user research.',
+        strengths: [
+          'Drove $3.2M ARR acceleration in 18 months',
+          'Elevated NRR from 104% to 121% through customer-validated security features',
+          'Shipped 24 consecutive sprint releases on time with 16-person engineering pod',
+        ],
+        interviewPrompts: [
+          'How do you prioritize between technical debt and customer feature requests when driving ARR growth?',
+          'Walk through a time you killed a roadmap feature based on discovery data.',
+        ],
+      },
+    },
   },
   {
     id: 'datascience',
@@ -120,8 +304,98 @@ Machine Learning Engineer | Apex Data Systems | 2019 - 2021
 
 EDUCATION
 Master of Science in Machine Learning & AI | Carnegie Mellon University (2017 - 2019)
-Bachelor of Technology in Computer Science | IIT Bombay (2013 - 2017)`
-  }
+Bachelor of Technology in Computer Science | IIT Bombay (2013 - 2017)`,
+    diagnostics: {
+      score: 94,
+      tierKicker: 'Top 5% AI / Machine Learning Tier',
+      matchTitle: 'Exceptional Fit for Applied AI & LLM Systems',
+      matchDescription: 'Production-scale ML deployments (80k docs/day), 97.4% precision benchmarks, and deep transformer fine-tuning expertise.',
+      metrics: {
+        impact: { value: 95, label: 'Quantified' },
+        atsFit: { value: 92, label: 'Keywords' },
+        structure: { value: 96, label: 'Hierarchy' },
+        brevity: { value: 91, label: 'Active Voice' },
+      },
+      bulletRewrites: [
+        {
+          category: 'NLP PIPELINE ARCHITECTURE · CORTEX COGNITIVE',
+          impactBoost: 'Impact Score: +48% boost',
+          beforeLabel: 'Before (Passive)',
+          beforeText: '"Built machine learning models to read documents and extract information automatically."',
+          afterLabel: 'After (n8n AI Optimization)',
+          afterText: '"Engineered and deployed transformer-based entity extraction pipeline processing 80,000+ PDFs daily with 97.4% precision on auto-scaled Kubernetes pods."',
+        },
+        {
+          category: 'SEMANTIC MATCHING ENGINE · APEX DATA',
+          impactBoost: 'Impact Score: +39% boost',
+          beforeLabel: 'Before (Vague)',
+          beforeText: '"Trained text summarization models and connected them with backend data pipelines."',
+          afterLabel: 'After (n8n AI Optimization)',
+          afterText: '"Fine-tuned domain-adapted BERT models for semantic candidate summarization, compressing recruiter screening latency by 60%."',
+        },
+      ],
+      keywords: [
+        {
+          name: 'MLOps & Model Monitoring',
+          status: 'missing',
+          importance: 'High',
+          contextTip: 'Include drift detection, Evidently AI, or MLflow tracking.',
+        },
+        {
+          name: 'Quantization & TensorRT',
+          status: 'missing',
+          importance: 'Medium',
+          contextTip: 'Useful for demonstrating latency optimization on GPU instances.',
+        },
+        {
+          name: 'LLM & Transformer Architecture',
+          status: 'found',
+          importance: 'High',
+          contextTip: 'Direct match across Hugging Face, PyTorch, and LangChain.',
+        },
+        {
+          name: 'Cloud Deployment (Kubernetes/SageMaker)',
+          status: 'found',
+          importance: 'High',
+          contextTip: 'Clear production deployment experience on GCP Vertex AI and AWS.',
+        },
+      ],
+      formattingChecks: [
+        {
+          title: 'Mathematical & Technical Term Parsing',
+          description: 'Specialized symbols and ML libraries parse cleanly into standard plain text tokens.',
+          passed: true,
+        },
+        {
+          title: 'Single-Column Clean Layout',
+          description: 'No text box floating layers or non-standard glyph bullet points.',
+          passed: true,
+        },
+        {
+          title: 'Publication & Education Verification',
+          description: 'Master of Science from CMU with clear degree classification.',
+          passed: true,
+        },
+        {
+          title: 'Repository & GitHub Affiliation',
+          description: 'Code portfolio links verified in contact header.',
+          passed: true,
+        },
+      ],
+      recruiterSummary: {
+        overview: 'Elite AI/ML Engineer with Carnegie Mellon Master’s pedigree and proven track record operating high-throughput document extraction pipelines (80k PDFs/day) at 97.4% precision.',
+        strengths: [
+          'Production scale: 80,000+ daily documents processed with sub-second latency',
+          'Deep expertise in modern LLM fine-tuning, embeddings, and vector databases',
+          'Carnegie Mellon Master of Science in ML & AI',
+        ],
+        interviewPrompts: [
+          'How do you measure and mitigate hallucinations and precision degradation in document extraction pipelines?',
+          'What trade-offs do you consider between fine-tuning vs. RAG for resume entity extraction?',
+        ],
+      },
+    },
+  },
 ];
 
 export function createSampleFile(sample: SampleResume): File {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import heroBanner from './assets/images/hero_resume_analytics_1790762407610.jpg';
 import { N8nConfig, SubmissionRecord, AtsCheckResult } from './types';
+import { SAMPLE_RESUMES, SampleResume, createSampleFile } from './utils/sampleResumes';
 import {
-  DEFAULT_N8N_CONFIG,
   loadStoredConfig,
   saveStoredConfig,
   loadSubmissionHistory,
@@ -11,6 +11,7 @@ import {
   SubmitResult,
 } from './services/n8nService';
 import { Navbar } from './components/Navbar';
+import { AtsDiagnosticsCard, DiagnosticsData } from './components/AtsDiagnosticsCard';
 import { ResumeForm } from './components/ResumeForm';
 import { ResumePreviewCard } from './components/ResumePreviewCard';
 import { EndpointSettingsModal } from './components/EndpointSettingsModal';
@@ -18,24 +19,28 @@ import { SubmissionSuccessModal } from './components/SubmissionSuccessModal';
 import { SubmissionHistoryModal } from './components/SubmissionHistoryModal';
 import { WorkflowDocsModal } from './components/WorkflowDocsModal';
 import {
-  CheckCircle2,
   Workflow,
   Sparkles,
-  Zap,
   ArrowRight,
   ExternalLink,
-  ShieldCheck,
   FileCheck2,
   Cpu,
   MailCheck,
+  Send,
 } from 'lucide-react';
 
 export default function App() {
   const [n8nConfig, setN8nConfig] = useState<N8nConfig>(loadStoredConfig());
   const [history, setHistory] = useState<SubmissionRecord[]>([]);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(() => createSampleFile(SAMPLE_RESUMES[0]));
   const [atsResult, setAtsResult] = useState<AtsCheckResult | null>(null);
-  const [extractedSnippet, setExtractedSnippet] = useState<string>('');
+  const [extractedSnippet, setExtractedSnippet] = useState<string>(SAMPLE_RESUMES[0].content.slice(0, 1500));
+  const [activeProfileId, setActiveProfileId] = useState<string>('fullstack');
+
+  // Diagnostics data (defaults to Maya Chen / screenshot data)
+  const [diagnosticsData, setDiagnosticsData] = useState<DiagnosticsData>(
+    SAMPLE_RESUMES[0].diagnostics
+  );
   
   // Modals state
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
@@ -86,6 +91,17 @@ export default function App() {
     setSelectedFile(file);
     setAtsResult(ats);
     setExtractedSnippet(snippet);
+    if (ats.diagnostics) {
+      setDiagnosticsData(ats.diagnostics);
+    }
+  };
+
+  const handleSelectSample = (sample: SampleResume) => {
+    setActiveProfileId(sample.id);
+    setDiagnosticsData(sample.diagnostics);
+    const file = createSampleFile(sample);
+    setSelectedFile(file);
+    setExtractedSnippet(sample.content.slice(0, 1500));
   };
 
   const handleSubmissionComplete = (result: {
@@ -117,125 +133,135 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans">
-      {/* Navigation */}
+    <div className="min-h-screen bg-[#07090e] text-neutral-100 flex flex-col font-sans selection:bg-rose-500/30 selection:text-rose-200">
+      {/* Top Navbar */}
       <Navbar
         n8nConfig={n8nConfig}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenDocs={() => setIsDocsOpen(true)}
         historyCount={history.length}
+        endpointStatus={endpointStatus}
       />
 
-      {/* Main Container */}
+      {/* Main Content Area */}
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-10">
         
-        {/* Hero Section */}
-        <section className="space-y-4">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div className="space-y-2 max-w-3xl">
-              <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
-                <span>Integrated n8n Webhook Pipeline</span>
-                <span aria-hidden="true">·</span>
-                <span className="text-neutral-500">Live Intake</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white text-balance">
-                Automated Resume Analysis &amp; Talent Pipeline
-              </h1>
-              <p className="text-sm text-neutral-400 max-w-2xl leading-relaxed">
-                Ingest applicant documents, run instant ATS pre-flight checks, and dispatch real-time payloads straight to your configured n8n Form Trigger.
+        {/* Profile Switcher & Context Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              Active Candidate Profile:
+            </span>
+            <div className="inline-flex rounded-lg bg-neutral-900/90 p-1 border border-neutral-800">
+              {SAMPLE_RESUMES.map((sample) => (
+                <button
+                  key={sample.id}
+                  type="button"
+                  onClick={() => handleSelectSample(sample)}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                    activeProfileId === sample.id
+                      ? 'bg-neutral-800 text-white shadow-sm font-semibold'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  {sample.name} ({sample.diagnostics.score}/100)
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 self-start sm:self-auto text-xs text-neutral-400">
+            <a
+              href="#portal"
+              className="inline-flex items-center gap-1.5 text-rose-400 hover:text-rose-300 transition-colors font-medium"
+            >
+              <Send className="h-3.5 w-3.5" />
+              <span>Jump to Dispatch Form</span>
+            </a>
+          </div>
+        </div>
+
+        {/* PRIMARY ATS DIAGNOSTICS & AUDIT STATUS CARD (Exact layout from user screenshot) */}
+        <section id="diagnostics">
+          <AtsDiagnosticsCard
+            data={diagnosticsData}
+            candidateName={selectedFile?.name}
+          />
+        </section>
+
+        {/* Submission & Inspection Section */}
+        <section className="space-y-6 pt-4">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-neutral-800/80 pb-3">
+            <div>
+              <h2 className="text-lg font-bold text-white tracking-tight">
+                Live Webhook Submission Portal
+              </h2>
+              <p className="text-xs text-neutral-400 mt-0.5">
+                Send candidate parameters and binary resume files directly to your n8n workflow
               </p>
             </div>
-
-            {/* Webhook Status Widget */}
-            <div className="rounded-xl border border-neutral-800 bg-neutral-900/90 p-3 sm:p-3.5 flex items-center justify-between sm:justify-start gap-3.5 self-start shrink-0">
-              <div className="flex items-center gap-2.5">
-                <span
-                  className={`h-2.5 w-2.5 rounded-full ${
-                    endpointStatus === 'ready'
-                      ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]'
-                      : endpointStatus === 'idle-test'
-                      ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]'
-                      : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]'
-                  }`}
-                />
-                <div className="text-xs">
-                  <div className="font-semibold text-white capitalize">
-                    {n8nConfig.mode} Mode
-                  </div>
-                  <div className="text-[11px] text-neutral-400">
-                    {endpointStatus === 'ready'
-                      ? 'Webhook listening & responsive'
-                      : endpointStatus === 'idle-test'
-                      ? 'Awaiting Execute step in n8n'
-                      : 'Endpoint offline'}
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsSettingsOpen(true)}
-                className="rounded-lg bg-neutral-800 hover:bg-neutral-700 px-2.5 py-1 text-[11px] font-medium text-neutral-200 transition-colors whitespace-nowrap"
-              >
-                Change
-              </button>
+            <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
+              <span className="text-neutral-500">Target:</span>
+              <span className="text-rose-300 truncate max-w-[280px]">
+                {n8nConfig.url}
+              </span>
             </div>
           </div>
-        </section>
 
-        {/* Two-Column Interactive Workspace */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Column: Submission Form (7 cols) */}
-          <div className="lg:col-span-7 space-y-6">
-            <ResumeForm
-              n8nConfig={n8nConfig}
-              onSubmissionComplete={handleSubmissionComplete}
-              onFileParsed={handleFileParsed}
-              onSwitchToProd={handleSwitchToProd}
-            />
-          </div>
-
-          {/* Right Column: Visual Preview & Pre-Flight Card (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            {/* Visual Hero Banner with styled fallback container */}
-            <div className="relative overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 shadow-sm aspect-video">
-              <img
-                src={heroBanner}
-                alt="Resume evaluation and analytical pipeline"
-                referrerPolicy="no-referrer"
-                className="h-full w-full object-cover transition-opacity duration-300"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Left: Interactive Submission Form (7 cols) */}
+            <div className="lg:col-span-7">
+              <ResumeForm
+                n8nConfig={n8nConfig}
+                onSubmissionComplete={handleSubmissionComplete}
+                onFileParsed={handleFileParsed}
+                onSwitchToProd={handleSwitchToProd}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent flex flex-col justify-end p-4">
-                <div className="flex items-center gap-2 text-xs font-semibold text-white">
-                  <Workflow className="h-4 w-4 text-rose-400" />
-                  <span>Resume Analyzer Workflow Engine</span>
-                </div>
-                <p className="text-[11px] text-neutral-300 mt-0.5">
-                  Direct webhook dispatch to <code className="font-mono text-rose-300">isayibhargavi.app.n8n.cloud</code>
-                </p>
-              </div>
             </div>
 
-            {/* Instant ATS Pre-Flight Card */}
-            <ResumePreviewCard
-              fileName={selectedFile?.name || ''}
-              fileSizeBytes={selectedFile?.size || 0}
-              atsResult={atsResult}
-              extractedSnippet={extractedSnippet}
-            />
+            {/* Right: Media Showcase & Pre-Flight Card (5 cols) */}
+            <div className="lg:col-span-5 space-y-6">
+              
+              {/* Media graphic with fallback */}
+              <div className="relative overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 shadow-sm aspect-video">
+                <img
+                  src={heroBanner}
+                  alt="Resume evaluation and analytical pipeline"
+                  referrerPolicy="no-referrer"
+                  className="h-full w-full object-cover transition-opacity duration-300"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent flex flex-col justify-end p-4">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-white">
+                    <Workflow className="h-4 w-4 text-rose-400" />
+                    <span>n8n Cloud Webhook Engine</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-300 mt-0.5">
+                    Direct integration with <code className="font-mono text-rose-300">isayibhargavi.app.n8n.cloud</code>
+                  </p>
+                </div>
+              </div>
+
+              {/* Pre-Flight Document Card */}
+              <ResumePreviewCard
+                fileName={selectedFile?.name || ''}
+                fileSizeBytes={selectedFile?.size || 0}
+                atsResult={atsResult}
+                extractedSnippet={extractedSnippet}
+              />
+            </div>
           </div>
         </section>
 
-        {/* Feature / Architecture Showcase Section */}
+        {/* Technical Pipeline Mechanism Section */}
         <section className="pt-8 border-t border-neutral-800">
           <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-base font-semibold text-white">
                 How Your n8n Automation Operates
               </h2>
               <p className="text-xs text-neutral-400 mt-0.5">
@@ -245,9 +271,9 @@ export default function App() {
             <button
               type="button"
               onClick={() => setIsDocsOpen(true)}
-              className="inline-flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 hover:underline self-start sm:self-auto"
+              className="inline-flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 hover:underline self-start sm:self-auto cursor-pointer"
             >
-              <span>Inspect Raw Schema</span>
+              <span>Inspect Workflow Schema</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -276,7 +302,7 @@ export default function App() {
                 2. Automated AI Extraction
               </h3>
               <p className="text-xs text-neutral-400 leading-relaxed">
-                n8n passes the binary document to language models (e.g. OpenAI or Gemini) to extract experience timelines, technical proficiencies, and candidate scorecards.
+                n8n passes the binary document to language models to evaluate Google XYZ bullet rewrites, extract missing ATS keywords, and benchmark impact score.
               </p>
             </div>
 
@@ -289,7 +315,7 @@ export default function App() {
                 3. Database &amp; Email Dispatch
               </h3>
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Results append seamlessly into Google Sheets, Notion, or Airtable while triggering customized automated acknowledgment emails to the applicant.
+                Results append seamlessly into Google Sheets, Notion, or Airtable while triggering automated feedback emails to the applicant.
               </p>
             </div>
           </div>
@@ -297,10 +323,10 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 border-t border-neutral-800 bg-neutral-950 py-8 text-xs text-neutral-500">
+      <footer className="mt-16 border-t border-neutral-800/80 bg-neutral-950 py-8 text-xs text-neutral-500">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-neutral-300">Resume Analyzer</span>
+            <span className="font-semibold text-neutral-300">ResumeAnalyser</span>
             <span>·</span>
             <span>Connected to n8n Cloud Pipeline</span>
           </div>
@@ -309,14 +335,14 @@ export default function App() {
             <button
               type="button"
               onClick={() => setIsDocsOpen(true)}
-              className="hover:text-neutral-300 transition-colors"
+              className="hover:text-neutral-300 transition-colors cursor-pointer"
             >
               Workflow Docs
             </button>
             <button
               type="button"
               onClick={() => setIsSettingsOpen(true)}
-              className="hover:text-neutral-300 transition-colors"
+              className="hover:text-neutral-300 transition-colors cursor-pointer"
             >
               Webhook Config
             </button>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { N8nConfig } from '../types';
-import { Settings, ShieldCheck, Activity, Terminal } from 'lucide-react';
+import { FileText, Cpu, ExternalLink, Settings, Terminal, History } from 'lucide-react';
 
 interface NavbarProps {
   n8nConfig: N8nConfig;
@@ -8,6 +8,7 @@ interface NavbarProps {
   onOpenHistory: () => void;
   onOpenDocs: () => void;
   historyCount: number;
+  endpointStatus: 'checking' | 'ready' | 'idle-test' | 'error';
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -16,74 +17,98 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenHistory,
   onOpenDocs,
   historyCount,
+  endpointStatus,
 }) => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-neutral-800/80 bg-neutral-950/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 w-full border-b border-neutral-800/80 bg-neutral-950/90 backdrop-blur-md">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
-        {/* Zone 1: Single Text Wordmark */}
-        <a href="#portal" className="text-lg font-bold tracking-tight text-white hover:text-rose-400 transition-colors">
-          Resume Analyzer
-        </a>
+        {/* Brand Area */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-rose-500/50 bg-rose-950/20 text-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.15)]">
+            <FileText className="h-5 w-5" />
+          </div>
 
-        {/* Zone 2: Clean Text Navigation Links */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-neutral-400">
-          <a href="#portal" className="hover:text-white transition-colors">
-            Submission Portal
-          </a>
-          <a href="#preflight" className="hover:text-white transition-colors">
-            ATS Pre-Flight
-          </a>
-          <button 
-            type="button" 
-            onClick={onOpenDocs} 
-            className="hover:text-white transition-colors cursor-pointer text-left"
+          <div>
+            <div className="flex items-center gap-2">
+              <a href="#" className="flex items-baseline text-lg font-bold tracking-tight">
+                <span className="text-white">Resume</span>
+                <span className="text-[#ea4b71]">Analyser</span>
+              </a>
+              <span className="rounded bg-rose-950/40 border border-rose-800/50 px-1.5 py-0.5 text-[10px] font-mono font-semibold tracking-wider text-rose-300">
+                N8N CLOUD
+              </span>
+            </div>
+            <p className="text-xs text-neutral-400 font-medium">
+              Automated Workflow &amp; ATS Diagnostics
+            </p>
+          </div>
+        </div>
+
+        {/* Right Navigation & Actions */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          
+          {/* Submissions count (quick link) */}
+          <button
+            type="button"
+            onClick={onOpenHistory}
+            className="hidden lg:flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors cursor-pointer"
           >
-            n8n Pipeline
-          </button>
-          <button 
-            type="button" 
-            onClick={onOpenHistory} 
-            className="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
-          >
+            <History className="h-3.5 w-3.5 text-neutral-500" />
             <span>Submissions</span>
             {historyCount > 0 && (
-              <span className="font-mono text-xs tabular-nums text-neutral-300">
+              <span className="font-mono text-[11px] text-neutral-400 tabular-nums">
                 ({historyCount})
               </span>
             )}
           </button>
-        </nav>
 
-        {/* Zone 3: 1-2 Primary Actions */}
-        <div className="flex items-center gap-3">
+          {/* Workflow Live status pill */}
           <button
             type="button"
             onClick={onOpenSettings}
-            className="inline-flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/90 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-700 hover:text-white transition-all whitespace-nowrap"
+            className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/80 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-700 hover:text-white transition-colors cursor-pointer"
             title="Configure n8n Webhook Endpoint"
           >
             <span
               className={`h-2 w-2 rounded-full ${
-                n8nConfig.mode === 'production'
-                  ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
-                  : n8nConfig.mode === 'test'
-                  ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]'
-                  : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                endpointStatus === 'ready'
+                  ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)] animate-pulse'
+                  : endpointStatus === 'idle-test'
+                  ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]'
+                  : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.7)]'
               }`}
             />
-            <span className="capitalize">{n8nConfig.mode} Webhook</span>
-            <Settings className="h-3.5 w-3.5 text-neutral-400" />
+            <span className="text-neutral-200">
+              {endpointStatus === 'ready'
+                ? 'Workflow Live'
+                : endpointStatus === 'idle-test'
+                ? 'Test Mode Waiting'
+                : 'Webhook Offline'}
+            </span>
+            <Cpu className="h-3.5 w-3.5 text-neutral-500" />
           </button>
 
+          {/* Raw n8n Form link */}
+          <a
+            href={n8nConfig.url}
+            target="_blank"
+            rel="noreferrer"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors"
+          >
+            <span>Raw n8n Form</span>
+            <ExternalLink className="h-3.5 w-3.5 text-neutral-500" />
+          </a>
+
+          {/* Workflow Config CTA Button */}
           <button
             type="button"
-            onClick={onOpenDocs}
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 text-xs font-medium text-neutral-200 transition-colors whitespace-nowrap"
+            onClick={onOpenSettings}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#ea4b71] hover:bg-[#d63d60] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all cursor-pointer whitespace-nowrap"
           >
-            <Terminal className="h-3.5 w-3.5 text-rose-400" />
-            <span>Workflow Schema</span>
+            <span>Workflow Config</span>
           </button>
+
         </div>
       </div>
     </header>

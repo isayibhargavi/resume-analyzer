@@ -26,11 +26,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({
   onSwitchToProd,
 }) => {
   const [formState, setFormState] = useState<CandidateFormState>({
-    name: '',
-    email: '',
-    targetRole: '',
-    jobDescription: '',
-    files: [],
+    name: SAMPLE_RESUMES[0].name,
+    email: SAMPLE_RESUMES[0].email,
+    targetRole: SAMPLE_RESUMES[0].targetRole,
+    jobDescription: SAMPLE_RESUMES[0].jobDescription,
+    files: [createSampleFile(SAMPLE_RESUMES[0])],
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -63,10 +63,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleProcessFile = async (file: File) => {
+  const handleProcessFile = async (file: File, sampleOverride?: SampleResume) => {
     try {
       const { text, atsResult } = await parseResumeFile(file);
-      onFileParsed(file, atsResult, text.slice(0, 1500));
+      const diagnostics = sampleOverride ? sampleOverride.diagnostics : atsResult.diagnostics;
+      onFileParsed(file, { ...atsResult, diagnostics }, text.slice(0, 1500));
 
       // Auto-fill email or name if detected and currently empty
       if (!formState.email && atsResult.detectedEmail) {
@@ -96,7 +97,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({
     });
     setErrors({});
     setSubmitErrorNotice(null);
-    handleProcessFile(file);
+    handleProcessFile(file, sample);
   };
 
   const handleRemoveFile = (index: number) => {

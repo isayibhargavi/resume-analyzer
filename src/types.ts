@@ -1,3 +1,5 @@
+import { DiagnosticsData } from './components/AtsDiagnosticsCard';
+
 export type N8nMode = 'production' | 'test' | 'custom';
 
 export interface N8nConfig {
@@ -32,7 +34,9 @@ export interface AtsCheckResult {
   }[];
   extractedSkills: string[];
   recommendations: string[];
+  diagnostics?: DiagnosticsData;
 }
+
 
 export interface SubmissionRecord {
   id: string;
